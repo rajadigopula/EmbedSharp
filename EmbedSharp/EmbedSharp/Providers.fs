@@ -4,6 +4,7 @@ namespace EmbedSharp
 
 open FSharp.Data
 open System.Linq
+open System.Text.RegularExpressions
 
 //DTO for Json
 type Provider( Name : string, ProviderUrl : string, Schemes : string[], oEmbedUrl : string, IsDiscoverable : Option<bool>, SupportedFormats : string[] ) = 
@@ -17,6 +18,14 @@ type Provider( Name : string, ProviderUrl : string, Schemes : string[], oEmbedUr
 type oEmbedProviders = JsonProvider<"http://oembed.com/providers.json">
 
 type Providers() = 
+    let MatchUrl url pattern = Regex.Match(url, pattern).Success
+
+    let ValidateUrl url validSchemes = 
+        validSchemes 
+            |> Seq.map (fun x -> MatchUrl url x) 
+            |> Seq.exists (fun x -> x = true)
+
+    //public members for Providers()
     member this.GetAllAvailableProviders() = 
         let providerUrls = oEmbedProviders.Load("http://oembed.com/providers.json")
         providerUrls 
@@ -26,3 +35,6 @@ type Providers() =
                                                oEmbedUrl = x.Endpoints.FirstOrDefault().Url,
                                                IsDiscoverable = x.Endpoints.FirstOrDefault().Discovery,
                                                SupportedFormats = x.Endpoints.FirstOrDefault().Formats) )
+
+    
+        

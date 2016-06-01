@@ -21,6 +21,6 @@ open System
 open System.Linq
 
 let p = new Providers()
-((((p.GetAllAvailableProviders()).Last()).OEmbedUrl));;
+((((p.GetAllAvailableProviders()).First()).Schemes));;
 (p.GetAllAvailableProviders()) |> Seq.map (fun x -> x.Schemes.[0]) |> Seq.iter Console.WriteLine ;;
 p.GetAllAvailableProviders().Count();;
