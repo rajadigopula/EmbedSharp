@@ -11,7 +11,7 @@ type Provider( Name : string, ProviderUrl : string, Schemes : string[], oEmbedUr
     member this.Name = Name
     member this.ProviderUrl = ProviderUrl
     member this.Schemes = Schemes
-    member this.OEmbedUrl with get() = oEmbedUrl
+    member this.OEmbedUrl = oEmbedUrl
     member this.IsDiscoverable = IsDiscoverable
     member this.SupportedFormats = SupportedFormats
 
@@ -20,11 +20,13 @@ type oEmbedProviders = JsonProvider<"http://oembed.com/providers.json">
 type Providers() = 
     let MatchUrl url pattern = Regex.Match(url, pattern).Success
 
+    let RegexifySchemes schemes = Seq.map (fun (x:string) -> x.Replace("*","\w+")) schemes
+
     let ValidateUrl url validSchemes = 
         validSchemes 
             |> Seq.map (fun x -> MatchUrl url x) 
             |> Seq.exists (fun x -> x = true)
-
+    
     //public members for Providers()
     member this.GetAllAvailableProviders() = 
         let providerUrls = oEmbedProviders.Load("http://oembed.com/providers.json")
